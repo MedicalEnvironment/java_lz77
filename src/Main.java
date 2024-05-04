@@ -4,13 +4,14 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        if (args.length < 2) {
-            System.out.println("Usage: java Main <input_file> <output_file>");
+        if (args.length < 3) {
+            System.out.println("Usage: java Main <encode/decode> <input_file> <output_file>");
             return;
         }
 
-        String inputFile = args[0];
-        String outputFile = args[1];
+        String operation = args[0];
+        String inputFile = args[1];
+        String outputFile = args[2];
 
         try {
             FileInputStream inputStream = new FileInputStream(inputFile);
@@ -18,11 +19,23 @@ public class Main {
             inputStream.close();
 
             LZ77 lz77 = new LZ77();
-            byte[] encodedBytes = lz77.encode(inputBytes);
+            byte[] resultBytes;
+            if (operation.equalsIgnoreCase("encode")) {
+                resultBytes = lz77.encode(inputBytes);
+                System.out.println("Encoding successful.");
+            } else if (operation.equalsIgnoreCase("decode")) {
+                resultBytes = lz77.decode(inputBytes);
+                System.out.println("Decoding successful.");
 
-            writeToFile(outputFile, encodedBytes);
+                // Debug: Print decoded data
+                System.out.println("Decoded data: " + new String(resultBytes));
+            } else {
+                System.out.println("Invalid operation. Please specify 'encode' or 'decode'.");
+                return;
+            }
 
-            System.out.println("Encoding successful. Output written to " + outputFile);
+            writeToFile(outputFile, resultBytes);
+            System.out.println("Output written to " + outputFile);
         } catch (IOException e) {
             e.printStackTrace();
         }

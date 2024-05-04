@@ -43,7 +43,39 @@ public class LZ77 {
     }
 
     public byte[] decode(byte[] information) {
-        // Implementation of LZ77 decoding goes here
-        return information;
+        List<Byte> decodedBytes = new ArrayList<>();
+        int currentIndex = 0;
+
+        while (currentIndex < information.length) {
+            byte currentByte = information[currentIndex];
+            if (currentByte == 0) {
+
+                currentIndex++;
+                if (currentIndex < information.length) {
+                    decodedBytes.add(information[currentIndex]);
+                    currentIndex++;
+                }
+            } else {
+                // 'distance and length' pair
+                int distance = currentByte & 0xFF;
+                int length = information[currentIndex + 1] & 0xFF;
+                currentIndex += 2;
+
+                int start = decodedBytes.size() - distance;
+                for (int i = start, count = 0; count < length; i++, count++) {
+                    if (i >= 0 && i < decodedBytes.size()) {
+                        decodedBytes.add(decodedBytes.get(i));
+                    } else {
+                        decodedBytes.add((byte) 0);
+                    }
+                }
+            }
+        }
+
+        byte[] result = new byte[decodedBytes.size()];
+        for (int i = 0; i < decodedBytes.size(); i++) {
+            result[i] = decodedBytes.get(i);
+        }
+        return result;
     }
 }
